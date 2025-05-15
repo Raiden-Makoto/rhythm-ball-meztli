@@ -42,11 +42,46 @@ class RhythmBall(ShowBase):
         ]
 
         # --- Paddle ---
-        self.paddle = loader.loadModel('models/box')
-        self.paddle.reparentTo(render)
+        self.paddle = loader.loadModel('models/box') # type: ignore
+        self.paddle.reparentTo(render) # type: ignore
         self.paddle.setScale(3, 1, 0.5)
         self.paddle.setPos(0, 0, -5)
         self.paddle.setColor(0.0, 0.0, 0.0, 1)
 
         # --- Ball ---
+        self.ball = loader.loadModel('models/smiley') # type: ignore
+        self.ball.reparentTo(render) # type: ignore
+        self.ball.setscale(0.5)
+        self.ball.setPos(0, 0, 0)
+        self.ball.setColor(0.0, 0.0, 0.0, 1.0)
+
+        # --- Brick Layout ---
+        self.bricks = []
+        self.create_bricks(columns = 12, rows = 8) 
+
+        # --- Collision Setup ---
+        self.cTrav = CollisionTraverser()
+        self.cHandler = CollisionHandlerEvent()
+        self.cHandler.addInPattern('%fn-into-in')
+
+        # --- Paddle collider ---
+        paddleCollider = self.paddle.attachNewNode(CollisionNode('paddle'))
+        paddleCollider.node().addSolid(CollisionBox((0, 0, 0), (1.5, 0.5, 0.25)))
+        self.cTrav.addCollider(paddleCollider, self.cHandler)
+
+        # --- Ball collider --- 
+        ballCollider = self.ball.attachNewNode(CollisionNode('ball'))
+        ballCollider.node().addSolid(CollisionSphere(0, 0, 0, 0.5))
+        self.cTrav.addCollider(ballCollider, self.cHandler)
+        self.accept('ball-into-paddle', self.on_paddle_hit) # type: ignore
+
+        # --- Brick Collider --- 
+        for brick in self.bricks:
+            brickCollider = brick.attachNewNode(CollisionNode('brick'))
+            brickCollider.node().addSolid(CollisionBox((0, 0, 0), (0.3, 0.15, 0.25)))
+            self.cTrav.addCollider(brickCollider, self.cHandler)
+            self.accept('ball-into-brick', self.on_brick_hit, [brick])
+
+        
+
         
