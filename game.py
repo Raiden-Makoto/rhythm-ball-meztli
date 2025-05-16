@@ -82,6 +82,14 @@ class RhythmBall(ShowBase):
             self.cTrav.addCollider(brickCollider, self.cHandler)
             self.accept('ball-into-brick', self.on_brick_hit, [brick])
 
+        # --- Input Setup --- 
+        self.keys = {"left" : False, "right" : False}
+        self.accept("arrow_left", self.set_key, ["left", True])
+        self.accept("arrow_left-up", self.set_key, ["left", False])
+        self.accept("arrow_right", self.set_key, ["right", True])
+        self.accept("arrow_right-up", self.set_key, ["right", False])
+
+
         
 
         
